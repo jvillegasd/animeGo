@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { ActivityIndicator, StyleSheet, Text, View, Button, StatusBar } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 import { TouchableHighlight } from 'react-native-gesture-handler';
@@ -21,13 +21,19 @@ class Home extends Component {
     }
   }
 
+  navTo(site) {
+    this.props.navigation.navigate('Site', {
+      site: site
+    })
+  }
+
   render() {
     if (this.state.sites !== null) {
       let sitesObject = this.state.sites
       let self = this
       let spanishOptions = sitesObject.Español.map(function(val) {
         return (
-          <TouchableHighlight onPress={() => {alert(val)}} style={buttons.button} underlayColor="white">
+          <TouchableHighlight key={val} onPress={() => {self.navTo({val})}} style={buttons.button} underlayColor="white">
             <View>
               <Text style={buttons.text}>{val}</Text>
             </View>
@@ -36,7 +42,7 @@ class Home extends Component {
       })
       let englishOptions = sitesObject.English.map(function(val) {
         return (
-          <TouchableHighlight onPress={() => {alert(val)}} style={buttons.button} underlayColor="white">
+          <TouchableHighlight key={val} onPress={() => {alert('Under construction')}} style={buttons.button} underlayColor="white">
             <View>
               <Text style={buttons.text}>{val}</Text>
             </View>
