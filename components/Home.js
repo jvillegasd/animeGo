@@ -1,7 +1,7 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import {createAppContainer} from 'react-navigation';
-import {createStackNavigator} from 'react-navigation-stack';
+import { createAppContainer } from 'react-navigation';
+import { createStackNavigator } from 'react-navigation-stack';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 
 class Home extends Component {
@@ -12,7 +12,7 @@ class Home extends Component {
       backgroundColor: '#228922'
     }
   };
-  
+
   constructor(props) {
     super(props)
 
@@ -33,16 +33,16 @@ class Home extends Component {
       let self = this
       let spanishOptions = sitesObject.Español.map(function(val) {
         return (
-          <TouchableHighlight key={val} onPress={() => {self.navTo({val})}} style={buttons.button} underlayColor="white">
+          <TouchableHighlight key={val} onPress={() => { self.navTo({ val }) }} style={buttons.button} underlayColor="white">
             <View>
               <Text style={buttons.text}>{val}</Text>
             </View>
           </TouchableHighlight>
         );
       })
-      let englishOptions = sitesObject.English.map(function(val) {
+      let englishOptions = sitesObject.English.map(function (val) {
         return (
-          <TouchableHighlight key={val} onPress={() => {alert('Under construction')}} style={buttons.button} underlayColor="white">
+          <TouchableHighlight key={val} onPress={() => { alert('Under construction') }} style={buttons.button} underlayColor="white">
             <View>
               <Text style={buttons.text}>{val}</Text>
             </View>
@@ -52,20 +52,22 @@ class Home extends Component {
       return (
         <View>
           <View style={optionStyles.container}>
-            <Text>Español</Text>
-            <View>
+            <Text style={optionStyles.text}>Español</Text>
+            <View style={optionStyles.options}>
               {spanishOptions}
             </View>
           </View>
-          <Text>English</Text>
-          <View>
-            {englishOptions}
+          <View style={optionStyles.container}>
+            <Text style={optionStyles.text}>English</Text>
+            <View style={optionStyles.options}>
+              {englishOptions}
+            </View>
           </View>
         </View>
       );
     } else {
       return (
-        <View style = {loadingStyles.container}>
+        <View style={loadingStyles.container}>
           <ActivityIndicator size={60} color='#228922' />
           <Text style={loadingStyles.text}>Loading anime sites options...</Text>
         </View>
@@ -75,12 +77,12 @@ class Home extends Component {
 
   async componentDidMount() {
     let sites = await getSites()
-    this.setState({sites})
+    this.setState({ sites })
   }
 }
 
 async function getSites() {
-  const response = await fetch('{ip}/api/', {
+  const response = await fetch('http:///api/', {
     method: 'GET',
     headers: {
       'Accept': 'application/json',
@@ -104,8 +106,17 @@ const loadingStyles = StyleSheet.create({
 })
 
 const optionStyles = StyleSheet.create({
+  options: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    flexWrap: 'wrap'
+  },
+  text: {
+    fontSize: 20,
+    marginBottom: 10
+  },
   container: {
-
+    marginTop: 20
   }
 })
 
@@ -115,7 +126,7 @@ const buttons = StyleSheet.create({
     width: 150,
     height: 33,
     alignItems: 'center',
-    backgroundColor: '#2196F3',
+    backgroundColor: '#72BDA3',
     borderRadius: 5
   },
   text: {
