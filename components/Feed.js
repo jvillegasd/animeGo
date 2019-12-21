@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View, ScrollView } from 'react-native';
-import { createAppContainer } from 'react-navigation';
-import { createStackNavigator } from 'react-navigation-stack';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 
-class Site extends Component {
+class Feed extends Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: 'Site: ' + navigation.getParam('site', 'NO-ID')['val'],
+      title: navigation.getParam('site', 'NO-ID') + ' - Feed',
       headerTintColor: '#ffffff',
       headerStyle: {
         backgroundColor: '#228922'
@@ -18,23 +16,34 @@ class Site extends Component {
   constructor(props) {
     super(props)
 
-    global.site = this.props.navigation.getParam('site', 'NO-ID')['val']
+    global.site = this.props.navigation.getParam('site', 'NO-ID')
     this.state = {
-      feed: null
+      feed: null,
+      isLoading: true,
+      error: false
     }
   }
 
-  watchEpisode(slug_noEpisode) {
-    
+  watchEpisode(slug, noEpisode, idEpisode) {
+    this.props.navigation.navigate('Watch', {
+      site: global.site,
+      slug: slug,
+      no_episode: noEpisode,
+      id_episode: idEpisode
+    })
   }
 
   render() {
-    if (this.state.feed !== null) {
+    if (!this.state.isLoading) {
       let self = this
       let episodes = this.state.feed.map(function (field) {
         let keyButton = field.slug + '(-)' + field.no_episode
+        let idEpisode = ''
+        if (field.hasOwnProperty('id_episode')) {
+          idEpisode = field.id_episode
+        }
         return (
-          <TouchableHighlight key={keyButton} onPress={() => { self.watchEpisode(keyButton) }} style={buttons.button} underlayColor="white">
+          <TouchableHighlight key={keyButton} onPress={() => { self.watchEpisode(field.slug, field.no_episode, idEpisode) }} style={buttons.button} underlayColor="white">
             <View>
               <Text >{field.title + ' - ' + field.no_episode}</Text>
             </View>
@@ -60,7 +69,15 @@ class Site extends Component {
 
   async componentDidMount() {
     let feed = await getFeed()
-    this.setState({ feed })
+    if (feed.hasOwnProperty('message')) {
+      this.setState({error: true})
+    } else {
+      this.setState({ 
+        feed: feed,
+        isLoading: false,
+        error: false
+      })
+    }
   }
 }
 
@@ -92,7 +109,7 @@ const loadingStyles = StyleSheet.create({
 const buttons = StyleSheet.create({
   button: {
     marginBottom: 10,
-    width: 150,
+    width: 350,
     height: 33,
     alignItems: 'center',
     backgroundColor: '#72BDA3',
@@ -121,4 +138,4 @@ const optionStyles = StyleSheet.create({
   }
 })
 
-export default Site;
+export default Feed;

@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { createAppContainer } from 'react-navigation';
-import { createStackNavigator } from 'react-navigation-stack';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 
 class Home extends Component {
@@ -17,18 +15,20 @@ class Home extends Component {
     super(props)
 
     this.state = {
-      sites: null
+      sites: null,
+      isLoading: true,
+      error: false
     }
   }
 
   navTo(site) {
-    this.props.navigation.navigate('Site', {
-      site: site
+    this.props.navigation.navigate('Feed', {
+      site: site['val']
     })
   }
 
   render() {
-    if (this.state.sites !== null) {
+    if (!this.state.isLoading) {
       let sitesObject = this.state.sites
       let self = this
       let spanishOptions = sitesObject.Español.map(function(val) {
@@ -77,7 +77,15 @@ class Home extends Component {
 
   async componentDidMount() {
     let sites = await getSites()
-    this.setState({ sites })
+    if (sites.hasOwnProperty('message')) {
+      this.setState({error: true})
+    } else {
+      this.setState({ 
+        sites: sites,
+        isLoading: false,
+        error: false
+      })
+    }
   }
 }
 
