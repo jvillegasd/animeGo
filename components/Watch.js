@@ -35,7 +35,7 @@ class Watch extends Component {
   }
 
   render() {
-    if (!this.state.isLoading) {
+    if (!this.state.isLoading && !this.state.error) {
       let self = this
       const { width } = Dimensions.get('window')
       let streamsOptions = this.state.options.map(function (option) {
@@ -56,17 +56,28 @@ class Watch extends Component {
           </View>
         </View>
       );
-    } else {
+    } else if (this.state.isLoading) {
       return (
         <View style={loadingStyles.container}>
           <ActivityIndicator size={60} color='#228922' />
-          <Text style={loadingStyles.text}>Loading {global.site} watching options...</Text>
+          <Text style={loadingStyles.text}>Loading {global.site} streaming options...</Text>
+        </View>
+      );
+    } else if (this.state.error) {
+      return (
+        <View style={loadingStyles.container}>
+          <Text style={loadingStyles.text}>The server throws an unexpected error.</Text>
+          <TouchableHighlight key={'error'} onPress={() => { self.fetchingData(true) }} style={buttons.button} underlayColor="white">
+            <View>
+              <Text style={buttons.text}>{'Refresh'}</Text>
+            </View>
+          </TouchableHighlight>
         </View>
       );
     }
   }
 
-  async componentDidMount() {
+  async fetchingData(isError) {
     let options = await getOptions()
     if (options.hasOwnProperty('message')) {
       this.setState({ error: true })
@@ -77,6 +88,10 @@ class Watch extends Component {
         error: false
       })
     }
+  }
+
+  async componentDidMount() {
+    this.fetchingData(false)
   }
 }
 
@@ -114,6 +129,7 @@ const loadingStyles = StyleSheet.create({
   },
   text: {
     fontSize: 20,
+    marginBottom: 10
   }
 })
 

@@ -8,7 +8,8 @@ class Feed extends Component {
       title: navigation.getParam('site', 'NO-ID') + ' - Feed',
       headerTintColor: '#ffffff',
       headerStyle: {
-        backgroundColor: '#228922'
+        backgroundColor: '#228922',
+        marginBottom: 5
       }
     };
   };
@@ -34,7 +35,7 @@ class Feed extends Component {
   }
 
   render() {
-    if (!this.state.isLoading) {
+    if (!this.state.isLoading && !this.state.error) {
       let self = this
       let episodes = this.state.feed.map(function (field) {
         let keyButton = field.slug + '(-)' + field.no_episode
@@ -57,27 +58,48 @@ class Feed extends Component {
           </ScrollView>
         </View>
       );
-    } else {
+    } else if (this.state.isLoading) {
       return (
         <View style={loadingStyles.container}>
           <ActivityIndicator size={60} color='#228922' />
           <Text style={loadingStyles.text}>Loading {global.site} feed...</Text>
         </View>
       );
+    } else if (this.state.error) {
+      return (
+        <View style={loadingStyles.container}>
+          <Text style={loadingStyles.text}>The server throws an unexpected error.</Text>
+          <TouchableHighlight key={'error'} onPress={() => { self.fetchingData(true) }} style={buttons.button} underlayColor="white">
+            <View>
+              <Text style={buttons.text}>{'Refresh'}</Text>
+            </View>
+          </TouchableHighlight>
+        </View>
+      );
     }
   }
 
-  async componentDidMount() {
+  async fetchingData(isError) {
+    if (isError) {
+      this.setState({
+        isLoading: true,
+        error: false
+      })
+    }
     let feed = await getFeed()
     if (feed.hasOwnProperty('message')) {
-      this.setState({error: true})
+      this.setState({ error: true })
     } else {
-      this.setState({ 
+      this.setState({
         feed: feed,
         isLoading: false,
         error: false
       })
     }
+  }
+
+  async componentDidMount() {
+    this.fetchingData(false)
   }
 }
 
@@ -103,6 +125,7 @@ const loadingStyles = StyleSheet.create({
   },
   text: {
     fontSize: 20,
+    marginBottom: 10
   }
 })
 
@@ -134,7 +157,7 @@ const optionStyles = StyleSheet.create({
     marginBottom: 10
   },
   container: {
-    marginTop: 20
+    marginTop: 0
   }
 })
 

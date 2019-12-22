@@ -17,11 +17,7 @@ class WebVideo extends Component {
 
   render() {
     return (
-      <View style={{
-        flex: 1,
-        justifyContent: 'flex-start',
-        alignItems: 'stretch',
-      }}>
+      <View style={viewStyles.view}>
         <WebView
           allowsFullscreenVideo={true}
           scrollEnabled = {false}
@@ -35,5 +31,13 @@ class WebVideo extends Component {
     );
   }
 }
+
+const viewStyles = StyleSheet.create({
+  view: {
+    flex: 1,
+        justifyContent: 'flex-start',
+        alignItems: 'stretch',
+  }
+})
 
 export default WebVideo;

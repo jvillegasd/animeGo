@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View, AsyncStorage } from 'react-native';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 
 class Home extends Component {
@@ -21,17 +21,20 @@ class Home extends Component {
     }
   }
 
-  navTo(site) {
-    this.props.navigation.navigate('Feed', {
-      site: site['val']
-    })
+  async navTo(site) {
+    try {
+      await AsyncStorage.setItem('site', site['val'])
+      this.props.navigation.navigate('FeedScreen', {
+        site: site['val']
+      })
+    } catch (error) { console.log(error)}
   }
 
   render() {
-    if (!this.state.isLoading) {
+    let self = this
+    if (!this.state.isLoading && !this.state.error) {
       let sitesObject = this.state.sites
-      let self = this
-      let spanishOptions = sitesObject.Español.map(function(val) {
+      let spanishOptions = sitesObject.Español.map(function (val) {
         return (
           <TouchableHighlight key={val} onPress={() => { self.navTo({ val }) }} style={buttons.button} underlayColor="white">
             <View>
@@ -65,27 +68,48 @@ class Home extends Component {
           </View>
         </View>
       );
-    } else {
+    } else if (this.state.isLoading) {
       return (
         <View style={loadingStyles.container}>
           <ActivityIndicator size={60} color='#228922' />
           <Text style={loadingStyles.text}>Loading anime sites options...</Text>
         </View>
       );
+    } else if (this.state.error) {
+      return (
+        <View style={loadingStyles.container}>
+          <Text style={loadingStyles.text}>The server throws an unexpected error.</Text>
+          <TouchableHighlight key={'error'} onPress={() => { self.fetchingData(true) }} style={buttons.button} underlayColor="white">
+            <View>
+              <Text style={buttons.text}>{'Refresh'}</Text>
+            </View>
+          </TouchableHighlight>
+        </View>
+      );
     }
   }
 
-  async componentDidMount() {
+  async fetchingData(isError) {
+    if (isError) {
+      this.setState({
+        isLoading: true,
+        error: false
+      })
+    }
     let sites = await getSites()
     if (sites.hasOwnProperty('message')) {
-      this.setState({error: true})
+      this.setState({ error: true })
     } else {
-      this.setState({ 
+      this.setState({
         sites: sites,
         isLoading: false,
         error: false
       })
     }
+  }
+
+  async componentDidMount() {
+    this.fetchingData(false)
   }
 }
 
@@ -110,6 +134,7 @@ const loadingStyles = StyleSheet.create({
   },
   text: {
     fontSize: 20,
+    marginBottom: 10
   }
 })
 
