@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View, ScrollView } from 'react-native';
 import { TouchableHighlight } from 'react-native-gesture-handler';
+import { Divider, Button, Card, Title, Paragraph } from 'react-native-paper';
 
 class Feed extends Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: navigation.getParam('site', 'NO-ID') + ' - Feed',
+      title: navigation.getParam('site', 'NO-ID'),
       headerTintColor: '#ffffff',
       headerStyle: {
-        backgroundColor: '#228922',
-        marginBottom: 5
+        backgroundColor: '#228922'
       }
     };
   };
@@ -26,7 +26,7 @@ class Feed extends Component {
   }
 
   watchEpisode(slug, noEpisode, idEpisode) {
-    this.props.navigation.navigate('Watch', {
+    this.props.navigation.navigate('WatchScreen', {
       site: global.site,
       slug: slug,
       no_episode: noEpisode,
@@ -44,16 +44,31 @@ class Feed extends Component {
           idEpisode = field.id_episode
         }
         return (
-          <TouchableHighlight key={keyButton} onPress={() => { self.watchEpisode(field.slug, field.no_episode, idEpisode) }} style={buttons.button} underlayColor="white">
-            <View>
-              <Text >{field.title + ' - ' + field.no_episode}</Text>
-            </View>
-          </TouchableHighlight>
+          <View key={keyButton} style={{alignItems: 'center'}}>
+            <Card key={keyButton + 'c'} elevation={20} style={{width: '90%'}}>
+              <Card.Cover source={{ uri: 'https://picsum.photos/700' }} style={{height: 115}}/>
+              <Card.Content>
+                <Title>{field.title}</Title>
+                <Paragraph>Episode {field.no_episode}</Paragraph>
+              </Card.Content>
+              <Card.Actions>
+                <Button
+                  key={keyButton}
+                  onPress={() => { self.watchEpisode(field.slug, field.no_episode, idEpisode) }}
+                  uppercase={false}
+                  color='#C6C6C6'
+                >
+                  <Text style={{color: 'black'}}>Watch</Text>
+                </Button>
+              </Card.Actions>
+            </Card>
+            <Divider key={keyButton + 'b'} style={{marginBottom: 10}}></Divider>
+          </View>
         );
       })
       return (
-        <View style={optionStyles.container}>
-          <ScrollView ScrollView contentContainerStyle={optionStyles.options}>
+        <View>
+          <ScrollView>
             {episodes}
           </ScrollView>
         </View>
@@ -62,7 +77,7 @@ class Feed extends Component {
       return (
         <View style={loadingStyles.container}>
           <ActivityIndicator size={60} color='#228922' />
-          <Text style={loadingStyles.text}>Loading {global.site} feed...</Text>
+          <Text style={loadingStyles.text}>Loading feed...</Text>
         </View>
       );
     } else if (this.state.error) {
@@ -88,7 +103,10 @@ class Feed extends Component {
     }
     let feed = await getFeed()
     if (feed.hasOwnProperty('message')) {
-      this.setState({ error: true })
+      this.setState({ 
+        error: true,
+        isLoading: false
+      })
     } else {
       this.setState({
         feed: feed,
@@ -132,10 +150,10 @@ const loadingStyles = StyleSheet.create({
 const buttons = StyleSheet.create({
   button: {
     marginBottom: 10,
-    width: 350,
+    width: 150,
     height: 33,
     alignItems: 'center',
-    backgroundColor: '#72BDA3',
+    backgroundColor: '#C6C6C6',
     borderRadius: 5
   },
   text: {
@@ -143,21 +161,6 @@ const buttons = StyleSheet.create({
     textAlign: 'center',
     marginTop: 5,
     color: '#ffffff'
-  }
-})
-
-const optionStyles = StyleSheet.create({
-  options: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    flexWrap: 'wrap'
-  },
-  text: {
-    fontSize: 20,
-    marginBottom: 10
-  },
-  container: {
-    marginTop: 0
   }
 })
 

@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View, ScrollView, Dimensions } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View, ScrollView } from 'react-native';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 
 
 class Watch extends Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: navigation.getParam('site', 'NO-ID') + ' - Watch',
+      title: 'Streaming options',
       headerTintColor: '#ffffff',
       headerStyle: {
         backgroundColor: '#228922'
@@ -29,7 +29,7 @@ class Watch extends Component {
   }
 
   streamVideo(link) {
-    this.props.navigation.navigate('WebVideo', {
+    this.props.navigation.navigate('WebVideoScreen', {
       link: link
     })
   }
@@ -37,14 +37,15 @@ class Watch extends Component {
   render() {
     if (!this.state.isLoading && !this.state.error) {
       let self = this
-      const { width } = Dimensions.get('window')
       let streamsOptions = this.state.options.map(function (option) {
         return (
+          <View key={option.server_name} style={{width: '90%'}}>
           <TouchableHighlight key={option.server_name} onPress={() => { self.streamVideo(option.link) }} style={buttons.button} underlayColor="white">
             <View>
               <Text >{option.server_name}</Text>
             </View>
           </TouchableHighlight>
+          </View>
         );
       })
       return (
@@ -80,7 +81,10 @@ class Watch extends Component {
   async fetchingData(isError) {
     let options = await getOptions()
     if (options.hasOwnProperty('message')) {
-      this.setState({ error: true })
+      this.setState({ 
+        error: true,
+        isLoading: false
+      })
     } else {
       this.setState({
         options: options,
@@ -136,10 +140,9 @@ const loadingStyles = StyleSheet.create({
 const buttons = StyleSheet.create({
   button: {
     marginBottom: 10,
-    width: 350,
     height: 33,
     alignItems: 'center',
-    backgroundColor: '#72BDA3',
+    backgroundColor: '#C6C6C6',
     borderRadius: 5
   },
   text: {
@@ -152,9 +155,7 @@ const buttons = StyleSheet.create({
 
 const optionStyles = StyleSheet.create({
   options: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    flexWrap: 'wrap'
+    alignItems: 'center'
   },
   text: {
     fontSize: 20,

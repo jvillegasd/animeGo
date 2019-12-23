@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View, AsyncStorage } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View, AsyncStorage, ScrollView } from 'react-native';
 import { TouchableHighlight } from 'react-native-gesture-handler';
+import { Divider, Button, Card, Title, Paragraph } from 'react-native-paper';
 
 class Home extends Component {
   static navigationOptions = {
@@ -36,36 +37,68 @@ class Home extends Component {
       let sitesObject = this.state.sites
       let spanishOptions = sitesObject.Español.map(function (val) {
         return (
-          <TouchableHighlight key={val} onPress={() => { self.navTo({ val }) }} style={buttons.button} underlayColor="white">
+          /*<TouchableHighlight key={val} onPress={() => { self.navTo({ val }) }} style={buttons.button} underlayColor="white">
             <View>
               <Text style={buttons.text}>{val}</Text>
             </View>
-          </TouchableHighlight>
+          </TouchableHighlight>*/
+          <View key={val} style={{alignItems: 'center'}}>
+            <Card key={val + 'c'} elevation={20} style={{width: '90%'}}>
+              <Card.Cover source={{ uri: 'https://picsum.photos/700' }} style={{height: 115}}/>
+              <Card.Content>
+                <Title>{val}</Title>
+                <Paragraph>Language: Español</Paragraph>
+              </Card.Content>
+              <Card.Actions>
+                <Button
+                  key={val}
+                  onPress={() => { self.navTo({ val }) }}
+                  uppercase={false}
+                  color='#C6C6C6'
+                >
+                  <Text style={{color: 'black'}}>Go</Text>
+                </Button>
+              </Card.Actions>
+            </Card>
+            <Divider key={val + 'b'} style={{marginBottom: 10}}></Divider>
+          </View>
         );
       })
       let englishOptions = sitesObject.English.map(function (val) {
         return (
-          <TouchableHighlight key={val} onPress={() => { alert('Under construction') }} style={buttons.button} underlayColor="white">
+          /*<TouchableHighlight key={val} onPress={() => { alert('Under construction') }} style={buttons.button} underlayColor="white">
             <View>
               <Text style={buttons.text}>{val}</Text>
             </View>
-          </TouchableHighlight>
+          </TouchableHighlight>*/
+          <View key={val} style={{alignItems: 'center'}}>
+            <Card key={val + 'c'} elevation={20} style={{width: '90%'}}>
+              <Card.Cover source={{ uri: 'https://picsum.photos/700' }} style={{height: 115}}/>
+              <Card.Content>
+                <Title>{val}</Title>
+                <Paragraph>Language: English</Paragraph>
+              </Card.Content>
+              <Card.Actions>
+                <Button
+                  key={val}
+                  onPress={() => { alert('Under construction') }}
+                  uppercase={false}
+                  color='#C6C6C6'
+                >
+                  <Text style={{color: 'black'}}>Go</Text>
+                </Button>
+              </Card.Actions>
+            </Card>
+            <Divider key={val + 'b'} style={{marginBottom: 10}}></Divider>
+          </View>
         );
       })
       return (
         <View>
-          <View style={optionStyles.container}>
-            <Text style={optionStyles.text}>Español</Text>
-            <View style={optionStyles.options}>
-              {spanishOptions}
-            </View>
-          </View>
-          <View style={optionStyles.container}>
-            <Text style={optionStyles.text}>English</Text>
-            <View style={optionStyles.options}>
-              {englishOptions}
-            </View>
-          </View>
+          <ScrollView>
+            {spanishOptions}
+            {englishOptions}
+          </ScrollView>
         </View>
       );
     } else if (this.state.isLoading) {
@@ -98,7 +131,10 @@ class Home extends Component {
     }
     let sites = await getSites()
     if (sites.hasOwnProperty('message')) {
-      this.setState({ error: true })
+      this.setState({
+        error: true,
+        isLoading: false
+      })
     } else {
       this.setState({
         sites: sites,
@@ -138,28 +174,13 @@ const loadingStyles = StyleSheet.create({
   }
 })
 
-const optionStyles = StyleSheet.create({
-  options: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    flexWrap: 'wrap'
-  },
-  text: {
-    fontSize: 20,
-    marginBottom: 10
-  },
-  container: {
-    marginTop: 20
-  }
-})
-
 const buttons = StyleSheet.create({
   button: {
     marginBottom: 10,
     width: 150,
     height: 33,
     alignItems: 'center',
-    backgroundColor: '#72BDA3',
+    backgroundColor: '#C6C6C6',
     borderRadius: 5
   },
   text: {

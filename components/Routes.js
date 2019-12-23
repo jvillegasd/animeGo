@@ -48,7 +48,7 @@ const Site = createMaterialBottomTabNavigator({
 },
   {
     navigationOptions: {
-      header: null
+      header: null, 
     },
     barStyle: {
       backgroundColor: '#454955'
