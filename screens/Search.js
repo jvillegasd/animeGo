@@ -117,7 +117,7 @@ class Search extends Component {
 }
 
 async function getList() {
-  const endpoint = `http://144.91.74.212/api/${global.site}/search`
+  const endpoint = `http:///api/${global.site}/search`
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
