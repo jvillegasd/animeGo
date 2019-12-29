@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View, ScrollView } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View, ScrollView, AsyncStorage, FlatList } from 'react-native';
+import { Divider, Button, Card, Title } from 'react-native-paper';
 import { TouchableHighlight } from 'react-native-gesture-handler';
-import { Divider, Button, Card, Title, Paragraph } from 'react-native-paper';
 
-class Feed extends Component {
+class LastAnimeAdded extends Component {
   static navigationOptions = ({ navigation }) => {
+    const { params } = navigation.state;
     return {
-      title: navigation.getParam('site', 'NO-ID'),
+      title: params ? params.title : 'Last anime added',
       headerTintColor: '#ffffff',
       headerStyle: {
         backgroundColor: '#228922'
@@ -17,59 +18,48 @@ class Feed extends Component {
   constructor(props) {
     super(props)
 
-    global.site = this.props.navigation.getParam('site', 'NO-ID')
+    global.site = ''
     this.state = {
-      feed: null,
+      list: null,
       isLoading: true,
       error: false
     }
   }
 
-  watchEpisode(slug, noEpisode, idEpisode) {
-    this.props.navigation.navigate('WatchScreen', {
-      site: global.site,
-      slug: slug,
-      no_episode: noEpisode,
-      id_episode: idEpisode
-    })
-  }
-
   render() {
+    let self = this
     if (!this.state.isLoading && !this.state.error) {
-      let self = this
-      let episodes = this.state.feed.map(function (field) {
-        let keyButton = field.slug + '(-)' + field.no_episode
-        let idEpisode = ''
+      let animes = this.state.list.map(function (field) {
+        let lastId = ''
         if (field.hasOwnProperty('id_episode')) {
-          idEpisode = field.id_episode
+          lastId = field.last_id
         }
         return (
-          <View key={keyButton} style={{alignItems: 'center'}}>
-            <Card key={keyButton + 'c'} elevation={20} style={{width: '90%'}}>
-              <Card.Cover source={{ uri: 'https://picsum.photos/700' }} style={{height: 115}}/>
+          <View key={field.slug} style={{ alignItems: 'center' }}>
+            <Card key={field.slug + 'c'} elevation={20} style={{ width: '90%' }}>
+              <Card.Cover source={{ uri: field.image }} style={{resizeMode:'stretch'}}/>
               <Card.Content>
                 <Title>{field.title}</Title>
-                <Paragraph>Episode {field.no_episode}</Paragraph>
               </Card.Content>
               <Card.Actions>
                 <Button
-                  key={keyButton}
-                  onPress={() => { self.watchEpisode(field.slug, field.no_episode, idEpisode) }}
+                  key={field.slug}
+                  onPress={() => { alert('const') }}
                   uppercase={false}
                   color='#C6C6C6'
                 >
-                  <Text style={{color: 'black'}}>Watch</Text>
+                  <Text style={{ color: 'black' }}>Go</Text>
                 </Button>
               </Card.Actions>
             </Card>
-            <Divider key={keyButton + 'b'} style={{marginBottom: 10}}></Divider>
+            <Divider key={field.slug + 'b'} style={{ marginBottom: 10 }}></Divider>
           </View>
         );
       })
       return (
         <View>
           <ScrollView>
-            {episodes}
+            {animes}
           </ScrollView>
         </View>
       );
@@ -77,7 +67,7 @@ class Feed extends Component {
       return (
         <View style={loadingStyles.container}>
           <ActivityIndicator size={60} color='#228922' />
-          <Text style={loadingStyles.text}>Loading feed...</Text>
+          <Text style={loadingStyles.text}>Loading list...</Text>
         </View>
       );
     } else if (this.state.error) {
@@ -101,15 +91,15 @@ class Feed extends Component {
         error: false
       })
     }
-    let feed = await getFeed()
-    if (feed.hasOwnProperty('message')) {
-      this.setState({ 
+    let list = await getList()
+    if (list.hasOwnProperty('message')) {
+      this.setState({
         error: true,
         isLoading: false
       })
     } else {
       this.setState({
-        feed: feed,
+        list: list,
         isLoading: false,
         error: false
       })
@@ -117,12 +107,17 @@ class Feed extends Component {
   }
 
   async componentDidMount() {
-    this.fetchingData(false)
+    const site = await AsyncStorage.getItem('site')
+    this.props.navigation.setParams({ title: site })
+    if (site) {
+      global.site = site
+      this.fetchingData(false)
+    }
   }
 }
 
-async function getFeed() {
-  const endpoint = `http:///api/${global.site}/feed`
+async function getList() {
+  const endpoint = `http://144.91.74.212/api/${global.site}/last`
   const response = await fetch(endpoint, {
     method: 'GET',
     headers: {
@@ -164,4 +159,4 @@ const buttons = StyleSheet.create({
   }
 })
 
-export default Feed;
+export default LastAnimeAdded;

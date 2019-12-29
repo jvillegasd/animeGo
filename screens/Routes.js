@@ -10,7 +10,7 @@ import FeedScreen from './Feed';
 import WatchScreen from './Watch';
 import WebVideoScreen from './WebVideo';
 import SearchScreen from './Search';
-import DirectoryScreen from './Directory';
+import LastAddedScreen from './LastAdded';
 
 const Feed = createStackNavigator({
   FeedScreen,
@@ -22,8 +22,8 @@ const Search = createStackNavigator({
   SearchScreen
 })
 
-const Directory = createStackNavigator({
-  DirectoryScreen
+const LastAdded = createStackNavigator({
+  LastAddedScreen
 })
 
 const Site = createMaterialBottomTabNavigator({
@@ -39,8 +39,8 @@ const Site = createMaterialBottomTabNavigator({
       tabBarIcon: () => <Ionicons size={20} name={'md-paper'} color={'white'} />
     }
   },
-  Directory: {
-    screen: Directory,
+  LastAdded: {
+    screen: LastAdded,
     navigationOptions: {
       tabBarIcon: () => <Ionicons size={20} name={'md-folder'} color={'white'} />
     }

@@ -1,73 +1,67 @@
 import React, { Component } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View, ScrollView, AsyncStorage } from 'react-native';
-import { Divider, Button, Card, Title, Paragraph } from 'react-native-paper';
+import { ActivityIndicator, StyleSheet, Text, View, ScrollView } from 'react-native';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 
-class Directory extends Component {
+
+class Watch extends Component {
   static navigationOptions = ({ navigation }) => {
-    const { params } = navigation.state;
     return {
-      title: params ? params.title: 'Directory',
+      title: 'Streaming options',
       headerTintColor: '#ffffff',
       headerStyle: {
         backgroundColor: '#228922'
       }
-    };
-  };
+    }
+  }
 
   constructor(props) {
     super(props)
 
-    global.site = ''
+    global.site = this.props.navigation.getParam('site', 'NO-ID')
+    global.slug = this.props.navigation.getParam('slug', 'NO-ID')
+    global.no_episode = this.props.navigation.getParam('no_episode', 'NO-ID')
+    global.id_episode = this.props.navigation.getParam('id_episode', 'NO-ID')
     this.state = {
-      list: null,
+      options: null,
       isLoading: true,
       error: false
     }
   }
 
+  streamVideo(link) {
+    this.props.navigation.navigate('WebVideoScreen', {
+      link: link,
+    })
+  }
+
   render() {
+    let self = this
     if (!this.state.isLoading && !this.state.error) {
-      let self = this
-      let animes = this.state.list.map(function (field) {
-        let lastId = ''
-        if (field.hasOwnProperty('id_episode')) {
-          lastId = field.last_id
-        }
+      let streamsOptions = this.state.options.map(function (option) {
         return (
-          <View key={field.slug} style={{alignItems: 'center'}}>
-            <Card key={field.slug + 'c'} elevation={20} style={{width: '90%'}}>
-              <Card.Cover source={{ uri: 'https://picsum.photos/700' }} style={{height: 115}}/>
-              <Card.Content>
-                <Title>{field.title}</Title>
-              </Card.Content>
-              <Card.Actions>
-                <Button
-                  key={field.slug}
-                  onPress={() => { alert('const') }}
-                  uppercase={false}
-                  color='#C6C6C6'
-                >
-                  <Text style={{color: 'black'}}>Go</Text>
-                </Button>
-              </Card.Actions>
-            </Card>
-            <Divider key={field.slug + 'b'} style={{marginBottom: 10}}></Divider>
+          <View key={option.server_name} style={{width: '90%'}}>
+          <TouchableHighlight key={option.server_name} onPress={() => { self.streamVideo(option.link) }} style={buttons.button} underlayColor="white">
+            <View>
+              <Text >{option.server_name}</Text>
+            </View>
+          </TouchableHighlight>
           </View>
         );
       })
       return (
         <View>
-          <ScrollView>
-            {animes}
-          </ScrollView>
+          <View style={optionStyles.container}>
+            <ScrollView ScrollView contentContainerStyle={optionStyles.options}>
+              {streamsOptions}
+            </ScrollView>
+          </View>
         </View>
       );
     } else if (this.state.isLoading) {
       return (
         <View style={loadingStyles.container}>
           <ActivityIndicator size={60} color='#228922' />
-          <Text style={loadingStyles.text}>Loading directory...</Text>
+          <Text style={loadingStyles.text}>Loading streaming options...</Text>
         </View>
       );
     } else if (this.state.error) {
@@ -91,41 +85,46 @@ class Directory extends Component {
         error: false
       })
     }
-    let list = await getList()
-    if (list.hasOwnProperty('message')) {
+    let options = await getOptions()
+    if (options.hasOwnProperty('message')) {
       this.setState({ 
         error: true,
         isLoading: false
       })
     } else {
       this.setState({
-        list: list,
+        options: options,
         isLoading: false,
         error: false
       })
     }
-    console.log(list)
   }
 
   async componentDidMount() {
-    const site = await AsyncStorage.getItem('site')
-    this.props.navigation.setParams({title: site})
-    if (site) {
-      global.site = site
-      this.setState({})
-      this.fetchingData(false)
-    }
+    this.fetchingData(false)
   }
 }
 
-async function getList() {
-  const endpoint = `http:///api/${global.site}/list`
+async function getOptions() {
+  const endpoint = `http://144.91.74.212/api/${global.site}/watch`
+  let body = {
+      'slug': global.slug,
+      'no_episode': global.no_episode
+    }
+  if (global.id_episode) {
+    body = {
+      'slug': global.slug,
+      'no_episode': global.no_episode,
+      'id_episode': global.id_episode
+    }
+  }
   const response = await fetch(endpoint, {
-    method: 'GET',
+    method: 'POST',
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-    }
+    },
+    body: JSON.stringify(body)
   })
   const json = await response.json()
   return json
@@ -147,7 +146,6 @@ const loadingStyles = StyleSheet.create({
 const buttons = StyleSheet.create({
   button: {
     marginBottom: 10,
-    width: 150,
     height: 33,
     alignItems: 'center',
     backgroundColor: '#C6C6C6',
@@ -161,4 +159,17 @@ const buttons = StyleSheet.create({
   }
 })
 
-export default Directory;
+const optionStyles = StyleSheet.create({
+  options: {
+    alignItems: 'center'
+  },
+  text: {
+    fontSize: 20,
+    marginBottom: 10
+  },
+  container: {
+    marginTop: 20
+  }
+})
+
+export default Watch;

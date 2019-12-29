@@ -37,17 +37,13 @@ class Home extends Component {
       let sitesObject = this.state.sites
       let spanishOptions = sitesObject.Español.map(function (val) {
         return (
-          /*<TouchableHighlight key={val} onPress={() => { self.navTo({ val }) }} style={buttons.button} underlayColor="white">
-            <View>
-              <Text style={buttons.text}>{val}</Text>
-            </View>
-          </TouchableHighlight>*/
           <View key={val} style={{alignItems: 'center'}}>
             <Card key={val + 'c'} elevation={20} style={{width: '90%'}}>
               <Card.Cover source={{ uri: 'https://picsum.photos/700' }} style={{height: 115}}/>
               <Card.Content>
                 <Title>{val}</Title>
                 <Paragraph>Language: Español</Paragraph>
+                <Divider key={val + 'd'} style={{marginBottom: 10}}></Divider>
               </Card.Content>
               <Card.Actions>
                 <Button
@@ -66,17 +62,13 @@ class Home extends Component {
       })
       let englishOptions = sitesObject.English.map(function (val) {
         return (
-          /*<TouchableHighlight key={val} onPress={() => { alert('Under construction') }} style={buttons.button} underlayColor="white">
-            <View>
-              <Text style={buttons.text}>{val}</Text>
-            </View>
-          </TouchableHighlight>*/
           <View key={val} style={{alignItems: 'center'}}>
             <Card key={val + 'c'} elevation={20} style={{width: '90%'}}>
               <Card.Cover source={{ uri: 'https://picsum.photos/700' }} style={{height: 115}}/>
               <Card.Content>
                 <Title>{val}</Title>
                 <Paragraph>Language: English</Paragraph>
+                <Divider key={val + 'd'} style={{marginBottom: 10}}></Divider>
               </Card.Content>
               <Card.Actions>
                 <Button
@@ -150,7 +142,7 @@ class Home extends Component {
 }
 
 async function getSites() {
-  const response = await fetch('http:///api/', {
+  const response = await fetch('http://144.91.74.212/api/', {
     method: 'GET',
     headers: {
       'Accept': 'application/json',
