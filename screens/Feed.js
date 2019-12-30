@@ -44,9 +44,9 @@ class Feed extends Component {
           idEpisode = field.id_episode
         }
         return (
-          <View key={keyButton} style={{alignItems: 'center'}}>
-            <Card key={keyButton + 'c'} elevation={20} style={{width: '90%'}}>
-              <Card.Cover source={{ uri: field.image }} style={{resizeMode:'stretch'}}/>
+          <View key={keyButton} style={{ alignItems: 'center' }}>
+            <Card key={keyButton + 'c'} elevation={20} style={{ width: '90%' }}>
+              <Card.Cover source={{ uri: field.image }} style={{ resizeMode: 'stretch' }} />
               <Card.Content>
                 <Title>{field.title}</Title>
                 <Paragraph>Episode {field.no_episode}</Paragraph>
@@ -58,11 +58,11 @@ class Feed extends Component {
                   uppercase={false}
                   color='#C6C6C6'
                 >
-                  <Text style={{color: 'black'}}>Watch</Text>
+                  <Text style={{ color: 'black' }}>Watch</Text>
                 </Button>
               </Card.Actions>
             </Card>
-            <Divider key={keyButton + 'b'} style={{marginBottom: 10}}></Divider>
+            <Divider key={keyButton + 'b'} style={{ marginBottom: 10 }}></Divider>
           </View>
         );
       })
@@ -101,17 +101,25 @@ class Feed extends Component {
         error: false
       })
     }
-    let feed = await getFeed()
-    if (feed.hasOwnProperty('message')) {
-      this.setState({ 
-        error: true,
-        isLoading: false
-      })
-    } else {
+    try {
+      let feed = await getFeed()
+      if (feed.hasOwnProperty('message')) {
+        this.setState({
+          error: true,
+          isLoading: false
+        })
+      } else {
+        this.setState({
+          feed: feed,
+          isLoading: false,
+          error: false
+        })
+      }
+    } catch (error) {
       this.setState({
-        feed: feed,
+        feed: null,
         isLoading: false,
-        error: false
+        error: true
       })
     }
   }
@@ -122,7 +130,7 @@ class Feed extends Component {
 }
 
 async function getFeed() {
-  const endpoint = `http:///api/${global.site}/feed`
+  const endpoint = `http://""/api/${global.site}/feed`
   const response = await fetch(endpoint, {
     method: 'GET',
     headers: {

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View, ScrollView, AsyncStorage, FlatList } from 'react-native';
-import { Divider, Button, Card, Title } from 'react-native-paper';
+import { ActivityIndicator, StyleSheet, Text, View, ScrollView, AsyncStorage, FlatList, Picker } from 'react-native';
+import { Divider, Button, Card, Title, Searchbar } from 'react-native-paper';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 
 class Search extends Component {
@@ -22,47 +22,92 @@ class Search extends Component {
     this.state = {
       list: null,
       isLoading: true,
-      error: false
+      error: false,
+      querySearch: '',
+      type: 'Normal',
+      genre: '',
+      genreList: null
     }
   }
 
   render() {
     let self = this
     if (!this.state.isLoading && !this.state.error) {
-      let animes = this.state.list.map(function (field) {
-        let lastId = ''
-        if (field.hasOwnProperty('id_episode')) {
-          lastId = field.last_id
-        }
+      if (this.state.type === 'Normal') {
         return (
-          <View key={field.slug} style={{ alignItems: 'center' }}>
-            <Card key={field.slug + 'c'} elevation={20} style={{ width: '90%' }}>
-              <Card.Cover source={{ uri: field.image }} style={{resizeMode:'stretch'}}/>
-              <Card.Content>
-                <Title>{field.title}</Title>
-              </Card.Content>
-              <Card.Actions>
-                <Button
-                  key={field.slug}
-                  onPress={() => { alert('const') }}
-                  uppercase={false}
-                  color='#C6C6C6'
+          <View>
+            <View key={'search'} style={{ alignItems: 'center', flexWrap: 'wrap' }}>
+              <View key={'first'} style={{ width: '90%', flexDirection: 'row', marginBottom: 5 }}>
+                <Searchbar
+                  placeholder='Search'
+                  onChangeText={query => this.setState({ querySearch: query })}
+                  value={this.state.querySearch}
+                  style={{ width: '75%' }}
+                />
+                <Picker
+                  selectedValue={this.state.genre}
+                  style={{ height: 50, width: '39%' }}
+                  onValueChange={currentValue => this.setState({ type: currentValue })}
                 >
-                  <Text style={{ color: 'black' }}>Go</Text>
-                </Button>
-              </Card.Actions>
-            </Card>
-            <Divider key={field.slug + 'b'} style={{ marginBottom: 10 }}></Divider>
+                  <Picker.Item label='Normal' value='Normal' />
+                  <Picker.Item label='By genre' value='Genre' />
+                </Picker>
+              </View>
+              <TouchableHighlight key={'search'} onPress={() => { alert('search') }} style={buttons2.button} underlayColor="white">
+                <View>
+                  <Text style={buttons.text}>{'Search'}</Text>
+                </View>
+              </TouchableHighlight>
+            </View>
+            <View key={'animeList'}>
+              <ScrollView>
+                <Text>Scroll</Text>
+              </ScrollView>
+            </View>
           </View>
         );
-      })
-      return (
-        <View>
-          <ScrollView>
-            {animes}
-          </ScrollView>
-        </View>
-      );
+      } else {
+        if (this.state.genreList === null) this.setState({error: true})
+        let genres = this.state.genreList.map(function(field) {
+          return (
+            <Picker.Item label={field} value={field} key={field}/>
+          );
+        })
+        return (
+          <View>
+            <View key={'genres'} style={{ alignItems: 'center', flexWrap: 'wrap' }}>
+              <View key={'first'} style={{ width: '90%', flexDirection: 'row', marginBottom: 5, marginLeft: '5%' }}>
+                <Picker
+                  selectedValue={this.state.genre}
+                  style={{ height: 50, width: '39%' }}
+                  onValueChange={currentValue => this.setState({ genre: currentValue })}
+                >
+                  {genres}
+                </Picker>
+                <Picker
+                  selectedValue={this.state.type}
+                  style={{ height: 50, width: '39%', marginLeft: '30%' }}
+                  onValueChange={currentValue => this.setState({ type: currentValue })}
+                >
+                  <Picker.Item label='Normal' value='Normal' />
+                  <Picker.Item label='By genre' value='Genre' />
+                </Picker>
+              </View>
+              <TouchableHighlight key={'search'} onPress={() => { alert('search') }} style={buttons2.button} underlayColor="white">
+                <View>
+                  <Text style={buttons.text}>{'Search'}</Text>
+                </View>
+              </TouchableHighlight>
+            </View>
+            <View key={'animeList'}>
+              <ScrollView>
+                <Text>Scroll</Text>
+              </ScrollView>
+            </View>
+          </View>
+        );
+      }
+
     } else if (this.state.isLoading) {
       return (
         <View style={loadingStyles.container}>
@@ -91,17 +136,25 @@ class Search extends Component {
         error: false
       })
     }
-    let list = await getList()
-    if (list.hasOwnProperty('message')) {
+    try {
+      let list = await getGenres()
+      if (list.hasOwnProperty('message')) {
+        this.setState({
+          error: true,
+          isLoading: false
+        })
+      } else {
+        this.setState({
+          genreList: list,
+          isLoading: false,
+          error: false
+        })
+      }
+    } catch (error) {
       this.setState({
-        error: true,
-        isLoading: false
-      })
-    } else {
-      this.setState({
-        list: list,
+        genreList: null,
         isLoading: false,
-        error: false
+        error: true
       })
     }
   }
@@ -111,27 +164,45 @@ class Search extends Component {
     this.props.navigation.setParams({ title: site })
     if (site) {
       global.site = site
-      // this.fetchingData(false)
+      await this.fetchingData(false)
+      this.setState({
+        isLoading: false,
+        error: false
+      })
     }
+
   }
 }
 
-async function getList() {
-  const endpoint = `http:///api/${global.site}/search`
+async function getGenres() {
+  const endpoint = `http://""/api/${global.site}/genre/list`
   const response = await fetch(endpoint, {
-    method: 'POST',
+    method: 'GET',
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-    },
-    body: {
-      'value': 'tg',
-      'page': 1
     }
   })
   const json = await response.json()
   return json
 }
+
+// async function getList() {
+//   const endpoint = `http://""/api/${global.site}/search`
+//   const response = await fetch(endpoint, {
+//     method: 'POST',
+//     headers: {
+//       'Accept': 'application/json',
+//       'Content-Type': 'application/json',
+//     },
+//     body: {
+//       'value': 'watashi',
+//       'page': 1
+//     }
+//   })
+//   const json = await response.json()
+//   return json
+// }
 
 const loadingStyles = StyleSheet.create({
   container: {
@@ -149,6 +220,24 @@ const loadingStyles = StyleSheet.create({
 const buttons = StyleSheet.create({
   button: {
     marginBottom: 10,
+    width: 150,
+    height: 33,
+    alignItems: 'center',
+    backgroundColor: '#C6C6C6',
+    borderRadius: 5
+  },
+  text: {
+    borderRadius: 20,
+    textAlign: 'center',
+    marginTop: 5,
+    color: '#ffffff'
+  }
+})
+
+const buttons2 = StyleSheet.create({
+  button: {
+    marginBottom: 10,
+    marginLeft: '10%',
     width: 150,
     height: 33,
     alignItems: 'center',

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View, ScrollView, AsyncStorage, FlatList } from 'react-native';
-import { Divider, Button, Card, Title } from 'react-native-paper';
+import { Divider, Button, Card, Title, Paragraph } from 'react-native-paper';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 
 class LastAnimeAdded extends Component {
@@ -37,9 +37,10 @@ class LastAnimeAdded extends Component {
         return (
           <View key={field.slug} style={{ alignItems: 'center' }}>
             <Card key={field.slug + 'c'} elevation={20} style={{ width: '90%' }}>
-              <Card.Cover source={{ uri: field.image }} style={{resizeMode:'stretch'}}/>
+              <Card.Cover source={{ uri: field.image }} style={{ resizeMode: 'stretch' }} />
               <Card.Content>
                 <Title>{field.title}</Title>
+                <Paragraph>Sipnosis: {field.description}</Paragraph>
               </Card.Content>
               <Card.Actions>
                 <Button
@@ -91,17 +92,25 @@ class LastAnimeAdded extends Component {
         error: false
       })
     }
-    let list = await getList()
-    if (list.hasOwnProperty('message')) {
+    try {
+      let list = await getList()
+      if (list.hasOwnProperty('message')) {
+        this.setState({
+          error: true,
+          isLoading: false
+        })
+      } else {
+        this.setState({
+          list: list,
+          isLoading: false,
+          error: false
+        })
+      }
+    } catch (error) {
       this.setState({
-        error: true,
-        isLoading: false
-      })
-    } else {
-      this.setState({
-        list: list,
+        list: null,
         isLoading: false,
-        error: false
+        error: true
       })
     }
   }
@@ -117,7 +126,7 @@ class LastAnimeAdded extends Component {
 }
 
 async function getList() {
-  const endpoint = `http:///api/${global.site}/last`
+  const endpoint = `http://""/api/${global.site}/last`
   const response = await fetch(endpoint, {
     method: 'GET',
     headers: {
