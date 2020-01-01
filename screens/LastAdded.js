@@ -126,7 +126,7 @@ class LastAnimeAdded extends Component {
 }
 
 async function getList() {
-  const endpoint = `http://""/api/${global.site}/last`
+  const endpoint = `http://""api/${global.site}/last`
   const response = await fetch(endpoint, {
     method: 'GET',
     headers: {
