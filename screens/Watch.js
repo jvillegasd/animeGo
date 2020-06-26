@@ -106,7 +106,7 @@ class Watch extends Component {
 }
 
 async function getOptions() {
-  const endpoint = `http://""/api/${global.site}/watch`
+  const endpoint = `http://144.91.74.212/api/${global.site}/watch`
   let body = {
       'slug': global.slug,
       'no_episode': global.no_episode

@@ -142,7 +142,7 @@ class Home extends Component {
 }
 
 async function getSites() {
-  const response = await fetch('http://""/api/', {
+  const response = await fetch('http://144.91.74.212/api/', {
     method: 'GET',
     headers: {
       'Accept': 'application/json',

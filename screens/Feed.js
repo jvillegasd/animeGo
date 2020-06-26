@@ -130,7 +130,7 @@ class Feed extends Component {
 }
 
 async function getFeed() {
-  const endpoint = `http://""/api/${global.site}/feed`
+  const endpoint = `http://144.91.74.212/api/${global.site}/feed`
   const response = await fetch(endpoint, {
     method: 'GET',
     headers: {

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View, ScrollView, AsyncStorage, FlatList } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View, ScrollView, AsyncStorage } from 'react-native';
 import { Divider, Button, Card, Title, Paragraph } from 'react-native-paper';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 
@@ -126,7 +126,7 @@ class LastAnimeAdded extends Component {
 }
 
 async function getList() {
-  const endpoint = `http://""/api/${global.site}/last`
+  const endpoint = `http://144.91.74.212/api/${global.site}/last`
   const response = await fetch(endpoint, {
     method: 'GET',
     headers: {

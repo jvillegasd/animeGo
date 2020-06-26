@@ -143,7 +143,6 @@ class Search extends Component {
       let list
       if (self.state.genre !== 'Search') list = await getAnimeGenres(self.state.genre, page)
       else list = await getAnimeSearch(self.state.querySearch, page)
-      console.log(list)
       if (list.hasOwnProperty('message')) {
         this.setState({
           errorSearch: true,
@@ -224,7 +223,7 @@ class Search extends Component {
 }
 
 async function getGenres() {
-  const endpoint = `http://""/api/${global.site}/genre/list`
+  const endpoint = `http://144.91.74.212/api/${global.site}/genre/list`
   const response = await fetch(endpoint, {
     method: 'GET',
     headers: {
@@ -237,7 +236,7 @@ async function getGenres() {
 }
 
 async function getAnimeGenres(genre, page) {
-  const endpoint = `http://""/api/${global.site}/genre`
+  const endpoint = `http://144.91.74.212/api/${global.site}/genre`
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
@@ -254,7 +253,7 @@ async function getAnimeGenres(genre, page) {
 }
 
 async function getAnimeSearch(querySearch, page) {
-  const endpoint = `http://""/api/${global.site}/search`
+  const endpoint = `http://144.91.74.212/api/${global.site}/search`
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
